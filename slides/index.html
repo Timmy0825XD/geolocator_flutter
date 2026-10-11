@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Dónde estás? — GPS en Flutter</title>
+<meta name="description" content="geolocator + flutter_map (OpenStreetMap): qué es, cómo funciona, permisos en Android/iOS/Web y demo con permiso aceptado y negado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topo" aria-hidden="true"></div>
+
+<header class="bar">
+  <div class="bar-in">
+    <span class="logo"><i></i>GPS · Flutter</span>
+    <span class="bar-meta"><span id="count">01 / 10</span><span class="sep">·</span><span id="crumb">Portada</span></span>
+  </div>
+  <div class="progress" aria-hidden="true"><span id="pbar"></span></div>
+</header>
+
+<nav class="dots" id="dots" aria-label="Ir a sección"></nav>
+
+<main>
+<!-- 1 PORTADA -->
+<section id="s1" data-name="Portada">
+  <div class="wrap hero">
+    <div class="rv">
+      <p class="kick"><b>01</b>Exposición · Desarrollo móvil · Oct 2026</p>
+      <h1>¿Dónde estás?<br><em>El GPS en Flutter</em></h1>
+      <p class="lead">De <code>pubspec.yaml</code> a tu primera coordenada. Misma API con <code>geolocator</code>, mapa con <code>flutter_map</code> + OpenStreetMap (sin API Key), tres contratos con el usuario.</p>
+      <div class="chips">
+        <span>geolocator ^14.1.1</span><span>flutter_map · OSM sin key</span><span>Android · iOS · Web</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn" href="#s2">Ver recorrido</a>
+        <a class="btn ghost" href="#s8">Ir al código</a>
+      </div>
+      <p class="team">Josheph Martinez · Oscar Duque · Sebastian Carrillo</p>
+    </div>
+    <div class="rv visual" aria-hidden="true">
+      <div class="radar">
+        <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+        <span class="sat a"></span><span class="sat b"></span><span class="sat c"></span>
+        <span class="fix"><span class="pulse"></span>±6 m</span>
+      </div>
+      <p class="cap">GNSS · 4 satélites · trilateración + corrección de reloj</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 AGENDA -->
+<section id="s2" data-name="Agenda">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>02</b>Agenda · 6 bloques</p>
+    <h2>Seis paradas,<br>un solo recorrido.</h2></div>
+    <ol class="agenda">
+      <li class="rv" style="--d:0ms"><b class="num">1</b><div><h3>Introducción</h3><p>Portada, equipo y agenda.</p></div></li>
+      <li class="rv" style="--d:50ms"><b class="num">2</b><div><h3>Explicación del tema</h3><p>Qué es, cómo funciona, casos y paquetes.</p></div></li>
+      <li class="rv" style="--d:100ms"><b class="num">3</b><div><h3>Permisos</h3><p>Android · iOS · Web + HTTPS.</p></div></li>
+      <li class="rv" style="--d:150ms"><b class="num">4</b><div><h3>Implementación</h3><p>pubspec, permiso, lectura, stream, mapa.</p></div></li>
+      <li class="rv" style="--d:200ms"><b class="num">5</b><div><h3>Demostración</h3><p>Aceptando y negando el permiso.</p></div></li>
+      <li class="rv" style="--d:250ms"><b class="num">6</b><div><h3>Cierre</h3><p>Conclusiones, repo y créditos.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 3 QUÉ ES -->
+<section id="s3" data-name="Qué es">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>03</b>Qué es</p>
+    <h2>GNSS es el sistema.<br>GPS es una constelación.</h2>
+    <p class="lead">Tu celular escucha satélites (GPS, GLONASS, Galileo, BeiDou). Cada uno grita <i>dónde estoy y qué hora es</i>. Con 3 distancias te ubicas; con la 4.ª corriges tu reloj barato.</p></div>
+    <div class="grid3">
+      <article class="rv card"><h3>GNSS</h3><p>Red de ~30 satélites por constelación a 20.200 km. No te rastrea: <b>tú los escuchas</b>.</p></article>
+      <article class="rv card" style="--d:60ms"><h3>geolocator</h3><p>Plugin federado. No toca hardware: delega a <code>FusedLocation</code> (Android), <code>Core Location</code> (iOS) o Geolocation API (Web).</p></article>
+      <article class="rv card" style="--d:120ms"><h3>flutter_map + OSM</h3><p>Solo dibuja: mapa, marcador y ruta. Sin key ni facturación. La posición siempre viene de <code>geolocator</code>.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- 4 CÓMO FUNCIONA -->
+<section id="s4" data-name="Cómo funciona">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>04</b>Cómo funciona · hardware y servicio</p>
+    <h2>Tres esferas te cruzan.<br>La cuarta te calibra.</h2></div>
+    <ol class="steps">
+      <li class="rv"><b>Paso 1</b><p>Cada satélite envía posición + hora atómica.</p></li>
+      <li class="rv" style="--d:50ms"><b>Paso 2</b><p>El receptor mide el retraso → distancia (velocidad luz × Δt).</p></li>
+      <li class="rv" style="--d:100ms"><b>Paso 3</b><p>3 distancias = 3 esferas que se cruzan en tu punto.</p></li>
+      <li class="rv" style="--d:150ms"><b>Paso 4</b><p>El 4.º satélite corrige el reloj: 1 µs ≈ 300 m de error.</p></li>
+    </ol>
+    <div class="table rv">
+      <div class="tr th"><span>Fuente</span><span>Precisión</span><span>Batería</span><span>Interiores</span></div>
+      <div class="tr"><span><i class="dot g"></i>GNSS</span><span>metros</span><span>alta</span><span>mal</span></div>
+      <div class="tr"><span><i class="dot b"></i>Wi-Fi</span><span>decenas m</span><span>baja</span><span>sí</span></div>
+      <div class="tr"><span><i class="dot v"></i>Torres</span><span>cientos m</span><span>baja</span><span>sí</span></div>
+      <div class="tr"><span><i class="dot o"></i>Sensores</span><span>suavizan</span><span>baja</span><span>complemento</span></div>
+    </div>
+    <p class="note rv">Android fusiona con <code>FusedLocationProviderClient</code> · iOS con <code>CLLocationManager</code> · Tú eliges <code>LocationAccuracy</code>, no la fuente.</p>
+  </div>
+</section>
+
+<!-- 5 CASOS -->
+<section id="s5" data-name="Casos de uso">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>05</b>Casos de uso reales</p>
+    <h2>Dónde paga el GPS.</h2></div>
+    <div class="grid3">
+      <article class="rv card"><h3>Delivery y transporte</h3><p>Rappi, Uber: lectura única + stream cada 10 m + <code>distanceBetween</code> para ETA.</p></article>
+      <article class="rv card" style="--d:60ms"><h3>Deporte</h3><p>Strava: tracking en 2.º plano con notificación persistente y pausa automática.</p></article>
+      <article class="rv card" style="--d:120ms"><h3>Emergencias</h3><p>Botón SOS envía <code>lat, lon, accuracy, timestamp</code> aunque sea grueso.</p></article>
+      <article class="rv card"><h3>Campo y logística</h3><p>Geocercas: si <code>distanceBetween &lt; 100 m</code>, marca llegada.</p></article>
+      <article class="rv card" style="--d:60ms"><h3>Retail</h3><p>Cupón al entrar al centro comercial (solo COARSE basta).</p></article>
+      <article class="rv card" style="--d:120ms"><h3>Fotografía</h3><p>Guarda <code>altitude + speed + timestamp</code> en cada foto.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- 6 PAQUETES -->
+<section id="s6" data-name="Paquetes">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>06</b>Paquete a usar · plataformas</p>
+    <h2>Uno lee. El otro dibuja.</h2></div>
+    <div class="grid2">
+      <article class="rv card big"><h3>geolocator ^14.1.1</h3><p><code>checkPermission · requestPermission · getCurrentPosition · getPositionStream · distanceBetween · openAppSettings</code></p><p class="mut">Android · iOS · macOS · Web</p></article>
+      <article class="rv card big" style="--d:80ms"><h3>flutter_map · OpenStreetMap</h3><p><code>FlutterMap · TileLayer · MarkerLayer · PolylineLayer</code>. Sin API Key, sin SHA1, sin facturación.</p><p class="mut">Android · iOS · Web · Desktop</p></article>
+    </div>
+    <figure class="rv code"><figcaption>pubspec.yaml</figcaption><pre><code>dependencies:
+  flutter:
+    sdk: flutter
+  geolocator: ^14.1.1
+  flutter_map: ^8.3.2
+  latlong2: ^0.9.1</code></pre></figure>
+    <figure class="rv code"><figcaption>Instalar</figcaption><pre><code>flutter pub add geolocator flutter_map latlong2
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter_map/flutter_map.dart';</code></pre></figure>
+  </div>
+</section>
+
+<!-- 7 PERMISOS -->
+<section id="s7" data-name="Permisos">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>07</b>Permisos · el corazón de la rúbrica</p>
+    <h2>Misma API, tres contratos.</h2></div>
+    <div class="grid3">
+      <article class="rv card"><h3><i class="dot g"></i>Android</h3><p>Hijos de <code>manifest</code>. Con ambos, el plugin usa el preciso.</p><ul class="speclist">
+        <li><code>ACCESS_FINE_LOCATION</code><span>Ubicación precisa · GPS</span></li>
+        <li><code>ACCESS_COARSE_LOCATION</code><span>Aproximada · Wi-Fi / torres</span></li>
+        <li><code>Solo primer plano</code><span>Sin foreground ni WAKE_LOCK en la demo</span></li>
+      </ul><p class="mut">Diálogo en ejecución. <code>deniedForever</code> solo se sabe tras <code>request</code>.</p></article>
+      <article class="rv card" style="--d:70ms"><h3><i class="dot v"></i>iOS</h3><p>Tú escribes el diálogo. Sin esta clave no funciona.</p><ul class="speclist">
+        <li><code>NSLocationWhenInUse…</code><span>Texto visible en el diálogo</span></li>
+        <li><code>NSLocationAlways…</code><span>Solo si pides fondo</span></li>
+        <li><code>Sin keys de mapa</code><span>OSM no pide nada en Info.plist</span></li>
+      </ul><p class="mut">Fondo exige capability + texto <code>Always</code>.</p></article>
+      <article class="rv card" style="--d:140ms"><h3><i class="dot o"></i>Web</h3><p>Nada que declarar. Lo pide el navegador.</p><ul class="speclist">
+        <li><code>HTTPS obligatorio</code><span>localhost es la excepción</span></li>
+        <li><code>getCurrentPosition()</code><span>Dispara el diálogo del navegador</span></li>
+        <li><code>Sin ajustes ni caché</code><span>No hay openAppSettings ni lastKnown</span></li>
+      </ul><p class="mut">Permiso por dominio, sin 2.º plano.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- 8 IMPLEMENTACIÓN -->
+<section id="s8" data-name="Implementación">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>08</b>Implementación · código limpio y comentado</p>
+    <h2>Servicio, permiso, lectura.</h2></div>
+    <figure class="rv code"><figcaption>lib/core/services/location_service.dart — flujo completo</figcaption><pre><code>Future&lt;Position&gt; determinarPosicion() async {
+  if (!await Geolocator.isLocationServiceEnabled())
+    throw LocationFailure('Activa el GPS');
+  var p = await Geolocator.checkPermission();
+  if (p == LocationPermission.denied)
+    p = await Geolocator.requestPermission();
+  if (p == LocationPermission.denied ||
+      p == LocationPermission.deniedForever)
+    throw LocationFailure('Sin permiso');
+  return Geolocator.getCurrentPosition(
+    locationSettings:
+      const LocationSettings(accuracy: LocationAccuracy.high),
+  ).timeout(const Duration(seconds: 15));
+}</code></pre></figure>
+    <div class="grid2">
+      <figure class="rv code"><figcaption>Stream 10 m + cancel</figcaption><pre><code>final sub = Geolocator.getPositionStream(
+  locationSettings: const LocationSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 10,
+  ),
+).listen((p) =&gt; moverMapa(p));
+await sub.cancel(); // al detener / dispose</code></pre></figure>
+      <figure class="rv code" style="--d:80ms"><figcaption>Mapa — mover + ruta (flutter_map)</figcaption><pre><code>FlutterMap(
+  mapController: map,
+  options: MapOptions(
+    initialCenter: LatLng(lat, lon),
+    initialZoom: 16),
+  children: [
+    TileLayer(urlTemplate:
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+    MarkerLayer(markers: [miPosicion]),
+    PolylineLayer(polylines: [ruta]),
+  ],
+)
+map.move(LatLng(lat, lon), 16);</code></pre></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 9 DEMO -->
+<section id="s9" data-name="Demo">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>09</b>Demostración · guion 2–3 min</p>
+    <h2>Aceptar y negar, en vivo.</h2></div>
+    <div class="grid2">
+      <article class="rv card ok"><h3>Camino feliz — aceptar</h3><p>1. Tab <b>Leer</b> → Permitir → <code>4.71, -74.07 ±6 m</code>.<br>2. Tab <b>Mapa</b> → marcador + cámara sigue.<br>3. Tab <b>Seguir</b> → camina 10 m → nuevo punto + <code>distanceBetween</code>.</p></article>
+      <article class="rv card bad" style="--d:80ms"><h3>Camino exigido — negar</h3><p>1. Revoca en Ajustes → Reintentar.<br>2. <code>denied</code> → tarjeta + explicación.<br>3. <code>deniedForever</code> → botón <b>Abrir ajustes</b> (móvil; en Web explica el candado).</p></article>
+    </div>
+    <div class="table rv">
+      <div class="tr th"><span>Fallo</span><span>Salida</span></div>
+      <div class="tr"><span>Servicio apagado</span><span>Avisar, no leer</span></div>
+      <div class="tr"><span>Timeout 15 s</span><span>Capturar y reintentar</span></div>
+      <div class="tr"><span>Sin Play Services</span><span>Respaldo LocationManager</span></div>
+      <div class="tr"><span>Sin internet</span><span>Tiles no cargan; lectura OK</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 CIERRE -->
+<section id="s10" data-name="Cierre">
+  <div class="wrap">
+    <div class="rv"><p class="kick"><b>10</b>Cierre</p>
+    <h2>El código se parece.<br>El permiso, no.</h2></div>
+    <div class="grid3">
+      <article class="rv card"><h3>Conclusiones</h3><p>Los satélites calculan tu posición, las redes y los sensores la complementan, el sistema operativo decide cómo fusionarlo todo y el usuario decide si tu app puede verlo. El código Dart se comparte entre plataformas; el contrato con el usuario —permiso, diálogo y aviso— no. Por eso el flujo siempre es el mismo: verifica el servicio, pide el permiso con una pantalla previa que genere confianza, lee con la precisión justa y ofrece siempre una salida clara cuando algo falla.</p></article>
+      <article class="rv card" style="--d:60ms"><h3>Buenas prácticas</h3><p>Pantalla previa · pide solo <code>high</code> si lo necesitas · <code>distanceFilter</code> de 10 m · botón detener visible · timeout de 15 s.</p></article>
+      <article class="rv card" style="--d:120ms"><h3>Aprendizajes</h3><p><code>deniedForever</code> se detecta distinto en Android y en iOS · en Web manda el navegador con HTTPS · OSM nos evitó keys y facturación.</p></article>
+    </div>
+    <div class="rv repo">
+      <div><p class="mut">Repositorio + README con instalación y permisos</p><p class="url">github.com/TU_USUARIO/app_geolocator</p></div>
+      <a class="btn" href="#s1">Volver al inicio</a>
+    </div>
+    <p class="team rv">Josheph Martinez · Oscar Duque · Sebastian Carrillo — Gracias.</p>
+  </div>
+</section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
